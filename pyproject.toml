@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "lesson-1"
+version = "0.1.0"
+description = ""
+authors = ["svetlana_savina <luca_aluca92@mail.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.14"
+black = "^26.1.0"
+flake8 = "^7.3.0"
+isort = "^7.0.0"
+mypy = "^1.19.1"
+pytest = "^9.0.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
