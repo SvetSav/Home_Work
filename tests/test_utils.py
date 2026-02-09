@@ -2,7 +2,8 @@ import json
 import os
 import tempfile
 
-from main import Category, load_categories_from_json
+from src.categories import Category
+from src.utils import load_categories_from_json
 
 
 class TestJsonLoader:
