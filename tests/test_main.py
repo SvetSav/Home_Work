@@ -84,10 +84,11 @@ class TestMainDemo:
             category1.description
             == "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни"
         )
-        assert len(category1.products) == 3
-        assert category1.products[0].name == "Samsung Galaxy S23 Ultra"
-        assert category1.products[1].name == "Iphone 15"
-        assert category1.products[2].name == "Xiaomi Redmi Note 11"
+        # Используем products_list вместо products для получения списка
+        assert len(category1.products_list) == 3
+        assert category1.products_list[0].name == "Samsung Galaxy S23 Ultra"
+        assert category1.products_list[1].name == "Iphone 15"
+        assert category1.products_list[2].name == "Xiaomi Redmi Note 11"
 
     def test_main_counters(self):
         """Тест счетчиков как в main.py."""
@@ -126,17 +127,17 @@ class TestMainDemo:
         assert category.name == "Смартфоны"
         assert (category.name == "Смартфоны") is True
 
-    def test_main_products_list_output(self):
+    def test_main_products_list_output(self) -> None:
         """Тест вывода списка продуктов как в main.py."""
         product = Product('55" QLED 4K', "Фоновая подсветка", 123000.0, 7)
         category = Category("Телевизоры", "Описание", [product])
 
-        # Проверяем строковое представление списка продуктов
-        products_repr = repr(category.products)
-        assert '55" QLED 4K' in products_repr
-        assert "Фоновая подсветка" in products_repr
-        assert "123000.0" in products_repr
-        assert "7" in products_repr
+        # Проверяем строковое представление через геттер products
+        products_str: str = category.products
+        # Проверяем по шаблону из задания: "Название продукта, X руб. Остаток: X шт."
+        assert '55" QLED 4K' in products_str
+        assert "123000.0 руб." in products_str
+        assert "Остаток: 7 шт." in products_str
 
     def test_main_file_exists(self):
         """Тест что main.py существует и может быть импортирован."""
@@ -375,7 +376,7 @@ class TestMainExtended:
 
             print(category1.name == "Смартфоны")
             print(category1.description)
-            print(len(category1.products))
+            print(len(category1.products_list))
             print(category1.category_count)
             print(category1.product_count)
 
@@ -388,7 +389,7 @@ class TestMainExtended:
 
             print(category2.name)
             print(category2.description)
-            print(len(category2.products))
+            print(len(category2.products_list))
             print(category2.products)
 
             print(Category.category_count)
@@ -411,9 +412,9 @@ class TestMainExtended:
                 for i, category in enumerate(loaded_categories, 1):
                     print(f"\nКатегория {i}: {category.name}")
                     print(f"Описание: {category.description}")
-                    print(f"Количество продуктов: {len(category.products)}")
+                    print(f"Количество продуктов: {len(category.products_list)}")
 
-                    for product in category.products:
+                    for product in category.products_list:
                         print(f"  - {product.name}: {product.price} руб., остаток: {product.quantity} шт.")
             else:
                 print("Не удалось загрузить данные из JSON файла.")

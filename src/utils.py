@@ -31,12 +31,7 @@ def load_categories_from_json(file_path: str = "products.json") -> List[Category
         # Создаем продукты для категории
         products = []
         for product_data in category_data["products"]:
-            product = Product(
-                name=product_data["name"],
-                description=product_data["description"],
-                price=product_data["price"],
-                quantity=product_data["quantity"],
-            )
+            product = Product.new_product(product_data)
             products.append(product)
 
         # Создаем категории
