@@ -1,18 +1,45 @@
 [tool.poetry]
 name = "lesson-1"
 version = "0.1.0"
-description = ""
-authors = ["svetlana_savina <luca_aluca92@mail.ru>"]
+description = "Управление продуктами и категориями"
+authors = ["Your Name <luca_aluca92@mail.ru>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.14"
-black = "^26.1.0"
-flake8 = "^7.3.0"
-isort = "^7.0.0"
-mypy = "^1.19.1"
-pytest = "^9.0.2"
+utils = "^1.0.2"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+coverage = "^7.0"
+flake8 = "^7.0"
+black = "^24.0"
+isort = "^5.13"
+
+[tool.flake8]
+max-line-length = 120
+ignore = ["E501", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "htmlcov",
+    ".pytest_cache",
+    ".idea"
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.black]
+line-length = 120
+target-version = ["py314"]
+
+[tool.isort]
+profile = "black"
 
 [build-system]
 requires = ["poetry-core"]
