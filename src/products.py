@@ -67,3 +67,18 @@ class Product:
 
     def __str__(self) -> str:
         return f"{self.name}, {self._price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other: "Product") -> float:
+        """
+        Магический метод сложения двух продуктов.
+        Возвращает сумму произведений цены на количество.
+
+        Args:
+            other: Другой объект Product
+
+        Returns:
+            float: Общая стоимость товаров на складе
+        """
+        if not isinstance(other, Product):
+            raise TypeError(f"Нельзя сложить Product и {type(other).__name__}")
+        return self.price * self.quantity + other.price * other.quantity

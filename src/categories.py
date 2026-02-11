@@ -1,4 +1,4 @@
-from typing import List
+from typing import Iterator, List
 
 from src.products import Product
 
@@ -67,14 +67,12 @@ class Category:
     def products(self):
         """
         Геттер для получения строкового представления продуктов.
+        Теперь использует __str__ каждого продукта.
 
         Returns:
             str: Строка со всеми продуктами
         """
-        result = []
-        for product in self._products:
-            result.append(f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.")
-        return "\n".join(result)
+        return "\n".join(str(product) for product in self._products)
 
     @property
     def products_list(self):
@@ -85,6 +83,16 @@ class Category:
             list: Список объектов Product
         """
         return self._products
+
+    @property
+    def total_quantity(self) -> int:
+        """
+        Подсчитывает общее количество товаров в категории.
+
+        Returns:
+            int: Суммарное количество всех товаров
+        """
+        return sum(product.quantity for product in self._products)
 
     @classmethod
     def reset_counters(cls):
@@ -99,4 +107,43 @@ class Category:
         return f"Category(name={self.name!r}, description={self.description!r}, products_count={len(self._products)})"
 
     def __str__(self) -> str:
-        return f"{self.name}, количество продуктов: {len(self._products)}"
+        """
+        Возвращает строковое представление категории с общим количеством товаров.
+        Суммирует quantity всех продуктов в категории.
+        """
+        total = sum(product.quantity for product in self._products)
+        return f"{self.name}, количество продуктов: {total} шт."
+
+    def __iter__(self) -> Iterator[Product]:
+        """
+        Возвращает итератор для перебора товаров в категории.
+        """
+        return CategoryIterator(self)
+
+
+class CategoryIterator:
+    """
+    Итератор для перебора товаров в категории.
+    """
+
+    def __init__(self, category: "Category"):
+        """
+        Инициализация итератора.
+
+        Args:
+            category: Объект Category для итерации
+        """
+        self._category = category
+        self._index = 0
+
+    def __iter__(self) -> Iterator[Product]:
+        """Возвращает сам итератор."""
+        return self
+
+    def __next__(self) -> Product:
+        """Возвращает следующий товар в категории."""
+        if self._index >= len(self._category._products):
+            raise StopIteration
+        product = self._category._products[self._index]
+        self._index += 1
+        return product

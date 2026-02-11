@@ -25,6 +25,10 @@ if __name__ == "__main__":
     print(product3.price)
     print(product3.quantity)
 
+    print(str(product1))
+    print(str(product2))
+    print(str(product3))
+
     category1 = Category(
         "Смартфоны",
         "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
@@ -36,6 +40,14 @@ if __name__ == "__main__":
     print(len(category1.products_list))  # Используем products_list для получения списка
     print(category1.category_count)
     print(category1.product_count)
+
+    print(str(category1))
+
+    print(category1.products)
+
+    print(product1 + product2)
+    print(product1 + product3)
+    print(product2 + product3)
 
     # Демонстрация геттера products
     print("\nСписок продуктов в категории 'Смартфоны':")
@@ -104,6 +116,15 @@ if __name__ == "__main__":
     test_product.price = 0
     print(f"Цена после попытки установить 0: {test_product.price}")
 
+    print("\n=== Демонстрация строкового представления категории ===")
+    print(f"Категория: {category1}")
+    print(f"Общее количество товаров в категории: {category1.total_quantity} шт.")
+
+    print("\n=== Демонстрация итерации по товарам категории ===")
+    print("Перебор товаров в категории 'Смартфоны':")
+    for i, product in enumerate(category1, 1):
+        print(f"  {i}. {product}")
+
     print("\n=== Загрузка из JSON файла ===")
 
     # Сбрасываем счетчики для демонстрации загрузки
@@ -122,6 +143,7 @@ if __name__ == "__main__":
             print(f"\nКатегория {i}: {category.name}")
             print(f"Описание: {category.description}")
             print(f"Количество продуктов: {len(category.products_list)}")
+            print(f"Общее количество товаров: {category.total_quantity} шт.")
 
             # Выводим продукты через геттер
             print("Продукты:")

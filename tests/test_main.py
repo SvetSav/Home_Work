@@ -504,3 +504,29 @@ def test_main_coverage_json_handling():
     finally:
         if os.path.exists(temp_file):
             os.unlink(temp_file)
+
+    def test_main_product_str_representation(self):
+        """Тест?, что main.py использует __str__ продукта."""
+        # Создаём продукт как в main.py
+        product = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+
+        # Проверяем, что str() возвращает ожидаемый формат
+        expected = "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
+        assert str(product) == expected
+
+    def test_main_product_addition(self):
+        """Тест, что main.py корректно складывает продукты."""
+        # Создаём продукты как в main.py
+        product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+        product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+        product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
+
+        # Проверяем сложение
+        # 180000 * 5 + 210000 * 8 = 900000 + 1680000 = 2580000
+        assert product1 + product2 == 2580000.0
+
+        # 180000 * 5 + 31000 * 14 = 900000 + 434000 = 1334000
+        assert product1 + product3 == 1334000.0
+
+        # 210000 * 8 + 31000 * 14 = 1680000 + 434000 = 2114000
+        assert product2 + product3 == 2114000.0

@@ -1,6 +1,8 @@
 import io
 import sys
 
+import pytest
+
 from src.products import Product
 
 
@@ -108,3 +110,54 @@ class TestProduct:
 
         assert product.price == 0.0
         assert product._price == 0.0
+
+    def test_product_str_method(self):
+        """Тест строкового представления продукта (__str__)."""
+        product = Product("iPhone 15", "Смартфон Apple", 120000.0, 10)
+
+        expected_str = "iPhone 15, 120000.0 руб. Остаток: 10 шт."
+        assert str(product) == expected_str
+
+        product2 = Product("MacBook Pro", "Ноутбук Apple", 250000.0, 3)
+        expected_str2 = "MacBook Pro, 250000.0 руб. Остаток: 3 шт."
+        assert str(product2) == expected_str2
+
+    def test_product_add_method(self):
+        """Тест магического метода сложения продуктов (__add__)."""
+        product1 = Product("Товар A", "Описание A", 100.0, 10)
+        product2 = Product("Товар B", "Описание B", 200.0, 2)
+
+        # 100 * 10 + 200 * 2 = 1000 + 400 = 1400
+        assert product1 + product2 == 1400.0
+
+        product3 = Product("Товар C", "Описание C", 50.0, 5)
+        product4 = Product("Товар D", "Описание D", 30.0, 3)
+
+        # 50 * 5 + 30 * 3 = 250 + 90 = 340
+        assert product3 + product4 == 340.0
+
+    def test_product_add_with_zero_quantity(self):
+        """Тест сложения продуктов с нулевым количеством."""
+        product1 = Product("Товар A", "Описание A", 100.0, 0)
+        product2 = Product("Товар B", "Описание B", 200.0, 2)
+
+        # 100 * 0 + 200 * 2 = 0 + 400 = 400
+        assert product1 + product2 == 400.0
+
+    def test_product_add_with_zero_price(self):
+        """Тест сложения продуктов с нулевой ценой."""
+        product1 = Product("Товар A", "Описание A", 0.0, 10)
+        product2 = Product("Товар B", "Описание B", 200.0, 2)
+
+        # 0 * 10 + 200 * 2 = 0 + 400 = 400
+        assert product1 + product2 == 400.0
+
+    def test_product_add_invalid_type(self):
+        """Тест сложения продукта с объектом другого типа."""
+        product = Product("Товар", "Описание", 100.0, 5)
+
+        with pytest.raises(TypeError, match="Нельзя сложить Product и str"):
+            product + "строка"
+
+        with pytest.raises(TypeError, match="Нельзя сложить Product и int"):
+            product + 10

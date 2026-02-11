@@ -1,4 +1,6 @@
-from src.categories import Category
+import pytest
+
+from src.categories import Category, CategoryIterator
 from src.products import Product
 
 
@@ -138,3 +140,94 @@ class TestCategory:
 
         assert category.category_count == 1
         assert category.product_count == 3
+
+    def test_category_str_method(self):
+        """Тест строкового представления категории (__str__)."""
+        products = [
+            Product("Телефон", "Смартфон", 50000.0, 10),
+            Product("Ноутбук", "Игровой ноутбук", 100000.0, 5),
+            Product("Планшет", "Графический планшет", 30000.0, 3),
+        ]
+
+        category = Category("Электроника", "Техника", products)
+
+        # Общее количество: 10 + 5 + 3 = 18
+        expected_str = "Электроника, количество продуктов: 18 шт."
+        assert str(category) == expected_str
+
+    def test_category_str_method_empty(self):
+        """Тест строкового представления пустой категории."""
+        category = Category("Пустая категория", "Нет товаров", [])
+
+        expected_str = "Пустая категория, количество продуктов: 0 шт."
+        assert str(category) == expected_str
+
+    def test_category_total_quantity_property(self):
+        """Тест свойства total_quantity."""
+        products = [
+            Product("Товар 1", "Описание 1", 100.0, 7),
+            Product("Товар 2", "Описание 2", 200.0, 3),
+            Product("Товар 3", "Описание 3", 300.0, 5),
+        ]
+
+        category = Category("Категория", "Описание", products)
+
+        # 7 + 3 + 5 = 15
+        assert category.total_quantity == 15
+
+        # Добавляем ещё товар
+        category.add_product(Product("Товар 4", "Описание 4", 400.0, 2))
+        assert category.total_quantity == 17
+
+    def test_category_iterator(self):
+        """Тест итератора для перебора товаров в категории."""
+        products = [
+            Product("Товар 1", "Описание 1", 100.0, 5),
+            Product("Товар 2", "Описание 2", 200.0, 3),
+            Product("Товар 3", "Описание 3", 300.0, 7),
+        ]
+
+        category = Category("Категория", "Описание", products)
+
+        # Проверяем, что можно итерироваться
+        product_names = []
+        for product in category:
+            product_names.append(product.name)
+
+        assert product_names == ["Товар 1", "Товар 2", "Товар 3"]
+
+        # Проверяем, что итератор работает несколько раз
+        product_names = [product.name for product in category]
+        assert product_names == ["Товар 1", "Товар 2", "Товар 3"]
+
+    def test_category_iterator_empty(self):
+        """Тест итератора для пустой категории."""
+        category = Category("Пустая", "Описание", [])
+
+        # При итерации по пустой категории не должно быть элементов
+        count = 0
+        for _ in category:
+            count += 1
+
+        assert count == 0
+
+    def test_category_iterator_class(self):
+        """Тест класса CategoryIterator напрямую."""
+        products = [
+            Product("Товар 1", "Описание 1", 100.0, 5),
+            Product("Товар 2", "Описание 2", 200.0, 3),
+        ]
+
+        category = Category("Категория", "Описание", products)
+        iterator = CategoryIterator(category)
+
+        # Проверяем __iter__
+        assert iter(iterator) is iterator
+
+        # Проверяем __next__
+        assert next(iterator).name == "Товар 1"
+        assert next(iterator).name == "Товар 2"
+
+        # Проверяем StopIteration
+        with pytest.raises(StopIteration):
+            next(iterator)
