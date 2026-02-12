@@ -4,9 +4,66 @@ import sys
 
 import pytest
 
-from src.products import LawnGrass, Product, Smartphone
+from src.products import BaseProduct, LawnGrass, Product, Smartphone
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+class TestBaseProduct:
+    """Тесты для абстрактного базового класса BaseProduct."""
+
+    def test_base_product_is_abstract(self):
+        """Тест, что BaseProduct является абстрактным классом."""
+        with pytest.raises(TypeError):
+            BaseProduct("Тест", "Описание", 100.0, 5)
+
+    def test_smartphone_inherits_from_base(self):
+        """Тест, что Smartphone наследуется от BaseProduct через Product."""
+        assert issubclass(Smartphone, BaseProduct) is True
+
+    def test_lawn_grass_inherits_from_base(self):
+        """Тест, что LawnGrass наследуется от BaseProduct через Product."""
+        assert issubclass(LawnGrass, BaseProduct) is True
+
+
+class TestPrintMixin:
+    """Тесты для миксина PrintMixin."""
+
+    def test_product_creation_prints_repr(self):
+        """Тест, что при создании Product печатается repr."""
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+
+        Product("Тест", "Описание", 100.0, 5)
+
+        sys.stdout = sys.__stdout__
+
+        output = captured_output.getvalue().strip()
+        assert output == "Product('Тест', 'Описание', 100.0, 5)"
+
+    def test_smartphone_creation_prints_repr(self):
+        """Тест, что при создании Smartphone печатается repr."""
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+
+        Smartphone("Samsung", "Описание", 50000.0, 5, 95.5, "S23", 256, "Черный")
+
+        sys.stdout = sys.__stdout__
+
+        output = captured_output.getvalue().strip()
+        assert output == "Smartphone('Samsung', 'Описание', 50000.0, 5, 95.5, 'S23', 256, 'Черный')"
+
+    def test_lawn_grass_creation_prints_repr(self):
+        """Тест, что при создании LawnGrass печатается repr."""
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+
+        LawnGrass("Трава", "Описание", 500.0, 20, "Россия", "7 дней", "Зеленый")
+
+        sys.stdout = sys.__stdout__
+
+        output = captured_output.getvalue().strip()
+        assert output == "LawnGrass('Трава', 'Описание', 500.0, 20, 'Россия', '7 дней', 'Зеленый')"
 
 
 class TestProduct:
@@ -211,10 +268,10 @@ class TestSmartphone:
         repr_str = repr(smartphone)
         assert "Smartphone" in repr_str
         assert "Samsung Galaxy S23 Ultra" in repr_str
-        assert "efficiency=95.5" in repr_str
-        assert "model='S23 Ultra'" in repr_str
-        assert "memory=256" in repr_str
-        assert "color='Серый'" in repr_str
+        assert "95.5" in repr_str  # Проверяем значение efficiency
+        assert "'S23 Ultra'" in repr_str  # Проверяем модель
+        assert "256" in repr_str  # Проверяем память
+        assert "'Серый'" in repr_str  # Проверяем цвет
 
     def test_smartphone_add_same_class(self):
         """Тест сложения двух смартфонов."""
@@ -277,9 +334,9 @@ class TestLawnGrass:
         repr_str = repr(grass)
         assert "LawnGrass" in repr_str
         assert "Газонная трава" in repr_str
-        assert "country='Россия'" in repr_str
-        assert "germination_period='7 дней'" in repr_str
-        assert "color='Зеленый'" in repr_str
+        assert "'Россия'" in repr_str  # Проверяем страну
+        assert "'7 дней'" in repr_str  # Проверяем срок прорастания
+        assert "'Зеленый'" in repr_str  # Проверяем цвет
 
     def test_lawn_grass_add_same_class(self):
         """Тест сложения двух продуктов газонной травы."""
