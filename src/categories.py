@@ -45,10 +45,18 @@ class Category:
     def add_product(self, product):
         """
         Добавляет продукт в категорию.
+        Можно добавить только объекты класса Product или его наследников.
 
         Args:
-            product: Объект класса Product для добавления
+            product: Объект класса Product или его наследника для добавления
+
+        Raises:
+            TypeError: Если product не является экземпляром Product или его наследника
         """
+        # Проверяем, что product является экземпляром Product или его наследника
+        if not isinstance(product, Product):
+            raise TypeError(f"Можно добавить только продукт или его наследника, а не {type(product).__name__}")
+
         # Если продукт уже есть в этой категории (тот же объект), не добавляем
         if product in self._products:
             print(f"Продукт '{product.name}' уже есть в категории '{self.name}'")

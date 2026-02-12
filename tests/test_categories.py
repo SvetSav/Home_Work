@@ -1,7 +1,10 @@
+import io
+import sys
+
 import pytest
 
 from src.categories import Category, CategoryIterator
-from src.products import Product
+from src.products import LawnGrass, Product, Smartphone
 
 
 class TestCategory:
@@ -56,6 +59,80 @@ class TestCategory:
         assert Category.product_count == 1
         assert len(category.products_list) == 1
         assert "Телефон, 50000.0 руб. Остаток: 10 шт." in category.products
+
+    def test_add_product_with_smartphone(self):
+        """Тест добавления смартфона в категорию."""
+        category = Category("Смартфоны", "Мобильные устройства", [])
+
+        smartphone = Smartphone("Samsung Galaxy S23 Ultra", "256GB", 180000.0, 5, 95.5, "S23 Ultra", 256, "Серый")
+
+        category.add_product(smartphone)
+
+        assert len(category.products_list) == 1
+        assert isinstance(category.products_list[0], Smartphone)
+        assert category.products_list[0].model == "S23 Ultra"
+        assert "Модель: S23 Ultra" in category.products
+
+    def test_add_product_with_lawn_grass(self):
+        """Тест добавления газонной травы в категорию."""
+        category = Category("Газоны", "Различные газоны", [])
+
+        grass = LawnGrass("Газонная трава", "Элитная", 500.0, 20, "Россия", "7 дней", "Зеленый")
+
+        category.add_product(grass)
+
+        assert len(category.products_list) == 1
+        assert isinstance(category.products_list[0], LawnGrass)
+        assert category.products_list[0].country == "Россия"
+        assert "Производитель: Россия" in category.products
+
+    def test_add_duplicate_product_inheritor(self):
+        """Тест добавления дубликата смартфона."""
+        category = Category("Смартфоны", "Мобильные устройства", [])
+
+        smartphone = Smartphone("Samsung Galaxy S23 Ultra", "256GB", 180000.0, 5, 95.5, "S23 Ultra", 256, "Серый")
+
+        # Добавляем первый раз
+        category.add_product(smartphone)
+        assert len(category.products_list) == 1
+
+        # Пытаемся добавить тот же объект второй раз
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+        category.add_product(smartphone)
+        sys.stdout = sys.__stdout__
+
+        assert len(category.products_list) == 1
+        assert "уже есть в категории" in captured_output.getvalue()
+
+    def test_add_product_type_check(self):
+        """Тест проверки типа при добавлении продукта."""
+        category = Category("Электроника", "Техника", [])
+
+        # Добавление обычного продукта - должно работать
+        product = Product("Телефон", "Смартфон", 50000.0, 10)
+        category.add_product(product)
+        assert len(category.products_list) == 1
+
+        # Добавление смартфона - должно работать
+        smartphone = Smartphone("Смартфон", "Описание", 50000.0, 5, 90.0, "X", 128, "Черный")
+        category.add_product(smartphone)
+        assert len(category.products_list) == 2
+
+        # Добавление газонной травы - должно работать
+        grass = LawnGrass("Трава", "Описание", 500.0, 20, "Россия", "7 дней", "Зеленый")
+        category.add_product(grass)
+        assert len(category.products_list) == 3
+
+        # Добавление объекта другого типа - должно вызывать ошибку
+        with pytest.raises(TypeError, match="Можно добавить только продукт или его наследника, а не str"):
+            category.add_product("не продукт")
+
+        with pytest.raises(TypeError, match="Можно добавить только продукт или его наследника, а не int"):
+            category.add_product(123)
+
+        # Количество продуктов не должно измениться
+        assert len(category.products_list) == 3
 
     def test_products_getter_format(self):
         """Тест формата вывода геттера products."""

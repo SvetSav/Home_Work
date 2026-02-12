@@ -1,9 +1,12 @@
 import io
+import os
 import sys
 
 import pytest
 
-from src.products import Product
+from src.products import LawnGrass, Product, Smartphone
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 class TestProduct:
@@ -122,7 +125,7 @@ class TestProduct:
         expected_str2 = "MacBook Pro, 250000.0 руб. Остаток: 3 шт."
         assert str(product2) == expected_str2
 
-    def test_product_add_method(self):
+    def test_product_add_method_same_class(self):
         """Тест магического метода сложения продуктов (__add__)."""
         product1 = Product("Товар A", "Описание A", 100.0, 10)
         product2 = Product("Товар B", "Описание B", 200.0, 2)
@@ -156,8 +159,186 @@ class TestProduct:
         """Тест сложения продукта с объектом другого типа."""
         product = Product("Товар", "Описание", 100.0, 5)
 
-        with pytest.raises(TypeError, match="Нельзя сложить Product и str"):
+        with pytest.raises(TypeError, match="Нельзя складывать товары разных классов: Product и str"):
             product + "строка"
 
-        with pytest.raises(TypeError, match="Нельзя сложить Product и int"):
+        with pytest.raises(TypeError, match="Нельзя складывать товары разных классов: Product и int"):
             product + 10
+
+
+class TestSmartphone:
+    """Тесты для класса Smartphone."""
+
+    def test_smartphone_initialization(self):
+        """Тест инициализации смартфона."""
+        smartphone = Smartphone(
+            "Samsung Galaxy S23 Ultra",
+            "256GB, Серый цвет, 200MP камера",
+            180000.0,
+            5,
+            95.5,
+            "S23 Ultra",
+            256,
+            "Серый",
+        )
+
+        assert smartphone.name == "Samsung Galaxy S23 Ultra"
+        assert smartphone.description == "256GB, Серый цвет, 200MP камера"
+        assert smartphone.price == 180000.0
+        assert smartphone.quantity == 5
+        assert smartphone.efficiency == 95.5
+        assert smartphone.model == "S23 Ultra"
+        assert smartphone.memory == 256
+        assert smartphone.color == "Серый"
+
+    def test_smartphone_inheritance(self):
+        """Тест наследования от Product."""
+        smartphone = Smartphone("Samsung Galaxy S23 Ultra", "Описание", 180000.0, 5, 95.5, "S23 Ultra", 256, "Серый")
+
+        assert isinstance(smartphone, Product)
+        assert isinstance(smartphone, Smartphone)
+
+    def test_smartphone_str_method(self):
+        """Тест строкового представления смартфона."""
+        smartphone = Smartphone("Samsung Galaxy S23 Ultra", "Описание", 180000.0, 5, 95.5, "S23 Ultra", 256, "Серый")
+
+        expected_str = "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт. Модель: S23 Ultra, 256ГБ, Серый"
+        assert str(smartphone) == expected_str
+
+    def test_smartphone_repr_method(self):
+        """Тест repr представления смартфона."""
+        smartphone = Smartphone("Samsung Galaxy S23 Ultra", "Описание", 180000.0, 5, 95.5, "S23 Ultra", 256, "Серый")
+        repr_str = repr(smartphone)
+        assert "Smartphone" in repr_str
+        assert "Samsung Galaxy S23 Ultra" in repr_str
+        assert "efficiency=95.5" in repr_str
+        assert "model='S23 Ultra'" in repr_str
+        assert "memory=256" in repr_str
+        assert "color='Серый'" in repr_str
+
+    def test_smartphone_add_same_class(self):
+        """Тест сложения двух смартфонов."""
+        smartphone1 = Smartphone("Samsung Galaxy S23 Ultra", "Описание", 180000.0, 5, 95.5, "S23 Ultra", 256, "Серый")
+        smartphone2 = Smartphone("Iphone 15", "Описание", 210000.0, 8, 98.2, "15", 512, "Gray space")
+
+        # 180000 * 5 + 210000 * 8 = 900000 + 1680000 = 2580000
+        assert smartphone1 + smartphone2 == 2580000.0
+
+    def test_smartphone_price_setter_inheritance(self):
+        """Тест наследования сеттера цены."""
+        smartphone = Smartphone("Samsung Galaxy S23 Ultra", "Описание", 180000.0, 5, 95.5, "S23 Ultra", 256, "Серый")
+
+        smartphone.price = 200000.0
+        assert smartphone.price == 200000.0
+
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+        smartphone.price = -100
+        sys.stdout = sys.__stdout__
+
+        assert smartphone.price == 200000.0
+        assert "Цена не должна быть нулевая или отрицательная" in captured_output.getvalue()
+
+
+class TestLawnGrass:
+    """Тесты для класса LawnGrass."""
+
+    def test_lawn_grass_initialization(self):
+        """Тест инициализации газонной травы."""
+        grass = LawnGrass("Газонная трава", "Элитная трава для газона", 500.0, 20, "Россия", "7 дней", "Зеленый")
+
+        assert grass.name == "Газонная трава"
+        assert grass.description == "Элитная трава для газона"
+        assert grass.price == 500.0
+        assert grass.quantity == 20
+        assert grass.country == "Россия"
+        assert grass.germination_period == "7 дней"
+        assert grass.color == "Зеленый"
+
+    def test_lawn_grass_inheritance(self):
+        """Тест наследования от Product."""
+        grass = LawnGrass("Газонная трава", "Описание", 500.0, 20, "Россия", "7 дней", "Зеленый")
+
+        assert isinstance(grass, Product)
+        assert isinstance(grass, LawnGrass)
+
+    def test_lawn_grass_str_method(self):
+        """Тест строкового представления газонной травы."""
+        grass = LawnGrass("Газонная трава", "Элитная трава для газона", 500.0, 20, "Россия", "7 дней", "Зеленый")
+
+        expected_str = (
+            "Газонная трава, 500.0 руб. Остаток: 20 шт. Производитель: Россия, срок прорастания: 7 дней, цвет: Зеленый"
+        )
+        assert str(grass) == expected_str
+
+    def test_lawn_grass_repr_method(self):
+        """Тест repr представления газонной травы."""
+        grass = LawnGrass("Газонная трава", "Описание", 500.0, 20, "Россия", "7 дней", "Зеленый")
+        repr_str = repr(grass)
+        assert "LawnGrass" in repr_str
+        assert "Газонная трава" in repr_str
+        assert "country='Россия'" in repr_str
+        assert "germination_period='7 дней'" in repr_str
+        assert "color='Зеленый'" in repr_str
+
+    def test_lawn_grass_add_same_class(self):
+        """Тест сложения двух продуктов газонной травы."""
+        grass1 = LawnGrass("Газонная трава", "Элитная трава", 500.0, 20, "Россия", "7 дней", "Зеленый")
+        grass2 = LawnGrass("Газонная трава 2", "Выносливая трава", 450.0, 15, "США", "5 дней", "Темно-зеленый")
+
+        # 500 * 20 + 450 * 15 = 10000 + 6750 = 16750
+        assert grass1 + grass2 == 16750.0
+
+
+class TestProductAdditionRestrictions:
+    """Тесты для ограничений сложения разных классов."""
+
+    def test_add_product_and_smartphone(self):
+        """Тест сложения Product и Smartphone."""
+        product = Product("Обычный товар", "Описание", 100.0, 5)
+        smartphone = Smartphone("Смартфон", "Описание", 50000.0, 2, 90.0, "X", 128, "Черный")
+
+        with pytest.raises(TypeError, match="Нельзя складывать товары разных классов: Product и Smartphone"):
+            _ = product + smartphone
+
+        with pytest.raises(TypeError, match="Нельзя складывать товары разных классов: Smartphone и Product"):
+            _ = smartphone + product
+
+    def test_add_product_and_lawn_grass(self):
+        """Тест сложения Product и LawnGrass."""
+        product = Product("Обычный товар", "Описание", 100.0, 5)
+        grass = LawnGrass("Трава", "Описание", 500.0, 20, "Россия", "7 дней", "Зеленый")
+
+        with pytest.raises(TypeError, match="Нельзя складывать товары разных классов: Product и LawnGrass"):
+            _ = product + grass
+
+        with pytest.raises(TypeError, match="Нельзя складывать товары разных классов: LawnGrass и Product"):
+            _ = grass + product
+
+    def test_add_smartphone_and_lawn_grass(self):
+        """Тест сложения Smartphone и LawnGrass."""
+        smartphone = Smartphone("Смартфон", "Описание", 50000.0, 2, 90.0, "X", 128, "Черный")
+        grass = LawnGrass("Трава", "Описание", 500.0, 20, "Россия", "7 дней", "Зеленый")
+
+        with pytest.raises(TypeError, match="Нельзя складывать товары разных классов: Smartphone и LawnGrass"):
+            _ = smartphone + grass
+
+        with pytest.raises(TypeError, match="Нельзя складывать товары разных классов: LawnGrass и Smartphone"):
+            _ = grass + smartphone
+
+    def test_smartphone_price_setter_inheritance(self):
+        """Тест наследования сеттера цены."""
+        smartphone = Smartphone("Samsung Galaxy S23 Ultra", "Описание", 180000.0, 5, 95.5, "S23 Ultra", 256, "Серый")
+
+        # Устанавливаем корректную цену
+        smartphone.price = 200000.0
+        assert smartphone.price == 200000.0
+
+        # Пытаемся установить отрицательную цену
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+        smartphone.price = -100
+        sys.stdout = sys.__stdout__
+
+        assert smartphone.price == 200000.0
+        assert "Цена не должна быть нулевая или отрицательная" in captured_output.getvalue()

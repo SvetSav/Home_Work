@@ -78,7 +78,97 @@ class Product:
 
         Returns:
             float: Общая стоимость товаров на складе
+
+        Raises:
+            TypeError: Если объекты разных классов
         """
-        if not isinstance(other, Product):
-            raise TypeError(f"Нельзя сложить Product и {type(other).__name__}")
+        if type(self) is not type(other):
+            raise TypeError(f"Нельзя складывать товары разных классов: {type(self).__name__} и {type(other).__name__}")
         return self.price * self.quantity + other.price * other.quantity
+
+
+class Smartphone(Product):
+    """Класс для представления смартфона."""
+
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        efficiency: float,
+        model: str,
+        memory: int,
+        color: str,
+    ):
+        """
+        Инициализация смартфона.
+
+        Args:
+            name: Название продукта
+            description: Описание продукта
+            price: Цена продукта
+            quantity: Количество в наличии
+            efficiency: Производительность
+            model: Модель
+            memory: Объем встроенной памяти (ГБ)
+            color: Цвет
+        """
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+    def __repr__(self) -> str:
+        return (
+            f"Smartphone(name={self.name!r}, description={self.description!r}, "
+            f"price={self._price}, quantity={self.quantity}, "
+            f"efficiency={self.efficiency}, model={self.model!r}, "
+            f"memory={self.memory}, color={self.color!r})"
+        )
+
+    def __str__(self) -> str:
+        return f"{self.name}, {self._price} руб. Остаток: {self.quantity} шт. Модель: {self.model}, {self.memory}ГБ, {self.color}"
+
+
+class LawnGrass(Product):
+    """Класс для представления газонной травы."""
+
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        country: str,
+        germination_period: str,
+        color: str,
+    ):
+        """
+        Инициализация газонной травы.
+
+        Args:
+            name: Название продукта
+            description: Описание продукта
+            price: Цена продукта
+            quantity: Количество в наличии
+            country: Страна-производитель
+            germination_period: Срок прорастания
+            color: Цвет
+        """
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
+
+    def __repr__(self) -> str:
+        return (
+            f"LawnGrass(name={self.name!r}, description={self.description!r}, "
+            f"price={self._price}, quantity={self.quantity}, "
+            f"country={self.country!r}, germination_period={self.germination_period!r}, "
+            f"color={self.color!r})"
+        )
+
+    def __str__(self) -> str:
+        return f"{self.name}, {self._price} руб. Остаток: {self.quantity} шт. Производитель: {self.country}, срок прорастания: {self.germination_period}, цвет: {self.color}"
