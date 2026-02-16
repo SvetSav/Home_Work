@@ -40,7 +40,7 @@ class PrintMixin:
         print(repr(self))
 
 
-class Product:
+class Product(BaseProduct, PrintMixin):
     """Класс для представления продукта."""
 
     name: str

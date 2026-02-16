@@ -17,6 +17,10 @@ class TestBaseProduct:
         with pytest.raises(TypeError):
             BaseProduct("Тест", "Описание", 100.0, 5)
 
+    def test_product_inherits_from_base(self):
+        """Тест, что Product наследуется от BaseProduct."""
+        assert issubclass(Product, BaseProduct) is True
+
     def test_smartphone_inherits_from_base(self):
         """Тест, что Smartphone наследуется от BaseProduct через Product."""
         assert issubclass(Smartphone, BaseProduct) is True
