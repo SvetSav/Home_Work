@@ -308,3 +308,53 @@ class TestCategory:
         # Проверяем StopIteration
         with pytest.raises(StopIteration):
             next(iterator)
+
+    def test_middle_price_normal(self):
+        """Тест подсчета средней цены для категории с товарами."""
+        products = [
+            Product("Товар 1", "Описание", 100.0, 5),
+            Product("Товар 2", "Описание", 200.0, 3),
+            Product("Товар 3", "Описание", 300.0, 7),
+        ]
+        category = Category("Категория", "Описание", products)
+
+        # Средняя цена: (100 + 200 + 300) / 3 = 200
+        assert category.middle_price() == 200.0
+
+    def test_middle_price_single_product(self):
+        """Тест подсчета средней цены для категории с одним товаром."""
+        products = [Product("Товар", "Описание", 500.0, 10)]
+        category = Category("Категория", "Описание", products)
+
+        assert category.middle_price() == 500.0
+
+    def test_middle_price_empty_category(self):
+        """Тест подсчета средней цены для пустой категории."""
+        category = Category("Пустая категория", "Описание", [])
+
+        assert category.middle_price() == 0.0
+
+    def test_middle_price_with_zero_price(self):
+        """Тест подсчета средней цены с товарами нулевой стоимости."""
+        products = [
+            Product("Товар 1", "Описание", 0.0, 5),
+            Product("Товар 2", "Описание", 100.0, 3),
+            Product("Товар 3", "Описание", 200.0, 7),
+        ]
+        category = Category("Категория", "Описание", products)
+
+        # Средняя цена: (0 + 100 + 200) / 3 = 100
+        assert category.middle_price() == 100.0
+
+    def test_middle_price_with_negative_price(self):
+        """Тест подсчета средней цены с товарами отрицательной стоимости."""
+        products = [
+            Product("Товар 1", "Описание", -50.0, 5),
+            Product("Товар 2", "Описание", 100.0, 3),
+            Product("Товар 3", "Описание", 150.0, 7),
+        ]
+        category = Category("Категория", "Описание", products)
+
+        # При отрицательной цене в __init__ она становится 0
+        # -50 превращается в 0, поэтому средняя: (0 + 100 + 150) / 3 = 83.33...
+        assert category.middle_price() == pytest.approx(83.33333)

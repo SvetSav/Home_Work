@@ -4,6 +4,7 @@ import sys
 
 import pytest
 
+from src.exceptions import ZeroQuantityError
 from src.products import BaseProduct, LawnGrass, Product, Smartphone
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -96,6 +97,15 @@ class TestProduct:
         assert product3.price == 31000.0
         assert product3.quantity == 14
 
+    def test_zero_quantity_error_raised(self):
+        """Тест, что при создании продукта с нулевым количеством возникает ValueError."""
+        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+            Product("Тест", "Описание", 100.0, 0)
+
+    def test_zero_quantity_error_inherits_from_exception(self):
+        """Тест, что ZeroQuantityError наследуется от Exception."""
+        assert issubclass(ZeroQuantityError, Exception)
+
     def test_new_product_class_method(self):
         """Тест класс-метода new_product."""
         product_data = {
@@ -186,6 +196,12 @@ class TestProduct:
         expected_str2 = "MacBook Pro, 250000.0 руб. Остаток: 3 шт."
         assert str(product2) == expected_str2
 
+    def test_product_repr_method(self):
+        """Тест repr представления продукта."""
+        product = Product("iPhone 15", "Смартфон Apple", 120000.0, 10)
+        repr_str = repr(product)
+        assert repr_str == "Product('iPhone 15', 'Смартфон Apple', 120000.0, 10)"
+
     def test_product_add_method_same_class(self):
         """Тест магического метода сложения продуктов (__add__)."""
         product1 = Product("Товар A", "Описание A", 100.0, 10)
@@ -201,12 +217,10 @@ class TestProduct:
         assert product3 + product4 == 340.0
 
     def test_product_add_with_zero_quantity(self):
-        """Тест сложения продуктов с нулевым количеством."""
-        product1 = Product("Товар A", "Описание A", 100.0, 0)
-        product2 = Product("Товар B", "Описание B", 200.0, 2)
-
-        # 100 * 0 + 200 * 2 = 0 + 400 = 400
-        assert product1 + product2 == 400.0
+        """Тест сложения продуктов."""
+        product1 = Product("Товар A", "Описание A", 100.0, 5)
+        product2 = Product("Товар B", "Описание B", 200.0, 3)
+        assert product1 + product2 == 1100.0
 
     def test_product_add_with_zero_price(self):
         """Тест сложения продуктов с нулевой ценой."""

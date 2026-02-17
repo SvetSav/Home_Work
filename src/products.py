@@ -57,7 +57,12 @@ class Product(BaseProduct, PrintMixin):
             description: Описание продукта
             price: Цена продукта
             quantity: Количество в наличии
+        Raises:
+            ValueError: Если количество равно 0
         """
+        if quantity == 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
+
         self.name = name
         self.description = description
         self._price = price if price > 0 else 0  # Защита от отрицательной цены

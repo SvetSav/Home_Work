@@ -1,5 +1,6 @@
 from typing import Iterator, List
 
+from src.exceptions import ZeroQuantityError
 from src.products import Product
 
 
@@ -43,33 +44,45 @@ class Category:
         Category.category_count += 1
 
     def add_product(self, product):
+        try:
+            if not isinstance(product, Product):
+                raise TypeError(f"Можно добавить только продукт или его наследника, а не {type(product).__name__}")
+
+            if product.quantity == 0:
+                raise ZeroQuantityError()
+
+            if product in self._products:
+                print(f"Продукт '{product.name}' уже есть в категории '{self.name}'")
+                return
+
+            self._products.append(product)
+            print(f"Товар {product.name} успешно добавлен")
+
+            if product not in Category._all_products:
+                Category._all_products.append(product)
+                Category.product_count += 1
+
+        except ZeroQuantityError as e:
+            print(f"Ошибка: {e}")
+            raise  # Пробрасываем исключение дальше
+        except TypeError as e:
+            print(f"Ошибка типа: {e}")
+            raise  # Пробрасываем исключение дальше
+        finally:
+            print("Обработка добавления товара завершена")
+
+    def middle_price(self) -> float:
         """
-        Добавляет продукт в категорию.
-        Можно добавить только объекты класса Product или его наследников.
+        Подсчитывает средний ценник всех товаров в категории.
 
-        Args:
-            product: Объект класса Product или его наследника для добавления
-
-        Raises:
-            TypeError: Если product не является экземпляром Product или его наследника
+        Returns:
+            float: Средняя цена товаров или 0, если в категории нет товаров
         """
-        # Проверяем, что product является экземпляром Product или его наследника
-        if not isinstance(product, Product):
-            raise TypeError(f"Можно добавить только продукт или его наследника, а не {type(product).__name__}")
-
-        # Если продукт уже есть в этой категории (тот же объект), не добавляем
-        if product in self._products:
-            print(f"Продукт '{product.name}' уже есть в категории '{self.name}'")
-            return
-
-        # Добавляем продукт в категорию
-        self._products.append(product)
-
-        # Проверяем, не был ли уже учтен этот продукт глобально
-        if product not in Category._all_products:
-            Category._all_products.append(product)
-            Category.product_count += 1
-            print(f"Добавлен новый продукт: {product.name}, всего продуктов: {Category.product_count}")
+        try:
+            total = sum(product.price for product in self._products)
+            return total / len(self._products)
+        except ZeroDivisionError:
+            return 0.0
 
     @property
     def products(self):
