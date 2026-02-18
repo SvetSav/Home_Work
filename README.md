@@ -79,6 +79,15 @@ poetry run coverage run --source=. -m pytest tests/ * Все тесты с по�
 
 poetry run python -m pytest tests/ --cov=. --cov-report=term * С отчетом о покрытии
 
+poetry run coverage html * Создание HTML-отчета
+
+start htmlcov/index.html * Открыть отчет в браузере Windows
+
+poetry run coverage run --source=src -m pytest tests/; `
+poetry run coverage report -m; `
+poetry run coverage html; `
+start htmlcov/index.html  * Все операции одной строкой в терминале
+
 ## Документация:
 
 Для получения дополнительной информации обратитесь к [документации](docs/README.md).
