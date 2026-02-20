@@ -1,15 +1,22 @@
+from typing import Iterator, List
+
+from src.exceptions import ZeroQuantityError
+from src.products import Product
+
+
 class Category:
     """Класс для представления категории товаров."""
 
     name: str
     description: str
-    products: list
+    _products: list  # Приватный атрибут
 
     # Атрибуты класса
     category_count: int = 0
     product_count: int = 0
+    _all_products: List[Product] = []  # Список всех уникальных продуктов
 
-    def __init__(self, name: str, description: str, products: list):
+    def __init__(self, name: str, description: str, products: list) -> None:
         """
         Инициализация категории.
 
@@ -20,14 +27,144 @@ class Category:
         """
         self.name = name
         self.description = description
-        self.products = products
+        self._products = []
 
-        # Увеличиваем счетчики при создании новой категории
+        # Добавляем продукты через тот же метод add_product
+        for product in products:
+            # Временно отключаем проверку на существование в категории для конструктора
+            if product not in self._products:
+                self._products.append(product)
+
+                # Проверяем, не был ли уже учтен этот продукт глобально
+                if product not in Category._all_products:
+                    Category._all_products.append(product)
+                    Category.product_count += 1
+
+        # Увеличиваем счетчик категорий
         Category.category_count += 1
-        Category.product_count += len(products)
+
+    def add_product(self, product):
+        try:
+            if not isinstance(product, Product):
+                raise TypeError(f"Можно добавить только продукт или его наследника, а не {type(product).__name__}")
+
+            if product.quantity == 0:
+                raise ZeroQuantityError()
+
+            if product in self._products:
+                print(f"Продукт '{product.name}' уже есть в категории '{self.name}'")
+                return
+
+            self._products.append(product)
+            print(f"Товар {product.name} успешно добавлен")
+
+            if product not in Category._all_products:
+                Category._all_products.append(product)
+                Category.product_count += 1
+
+        except ZeroQuantityError as e:
+            print(f"Ошибка: {e}")
+            raise  # Пробрасываем исключение дальше
+        except TypeError as e:
+            print(f"Ошибка типа: {e}")
+            raise  # Пробрасываем исключение дальше
+        finally:
+            print("Обработка добавления товара завершена")
+
+    def middle_price(self) -> float:
+        """
+        Подсчитывает средний ценник всех товаров в категории.
+
+        Returns:
+            float: Средняя цена товаров или 0, если в категории нет товаров
+        """
+        try:
+            total = sum(product.price for product in self._products)
+            return total / len(self._products)
+        except ZeroDivisionError:
+            return 0.0
+
+    @property
+    def products(self):
+        """
+        Геттер для получения строкового представления продуктов.
+        Теперь использует __str__ каждого продукта.
+
+        Returns:
+            str: Строка со всеми продуктами
+        """
+        return "\n".join(str(product) for product in self._products)
+
+    @property
+    def products_list(self):
+        """
+        Геттер для получения списка продуктов (для внутреннего использования).
+
+        Returns:
+            list: Список объектов Product
+        """
+        return self._products
+
+    @property
+    def total_quantity(self) -> int:
+        """
+        Подсчитывает общее количество товаров в категории.
+
+        Returns:
+            int: Суммарное количество всех товаров
+        """
+        return sum(product.quantity for product in self._products)
+
+    @classmethod
+    def reset_counters(cls):
+        """
+        Сбрасывает счетчики категорий и продуктов.
+        """
+        cls.category_count = 0
+        cls.product_count = 0
+        cls._all_products = []
 
     def __repr__(self) -> str:
-        return f"Category(name={self.name!r}, description={self.description!r}, products={self.products})"
+        return f"Category(name={self.name!r}, description={self.description!r}, products_count={len(self._products)})"
 
     def __str__(self) -> str:
-        return f"{self.name}, количество продуктов: {len(self.products)}"
+        """
+        Возвращает строковое представление категории с общим количеством товаров.
+        Суммирует quantity всех продуктов в категории.
+        """
+        total = sum(product.quantity for product in self._products)
+        return f"{self.name}, количество продуктов: {total} шт."
+
+    def __iter__(self) -> Iterator[Product]:
+        """
+        Возвращает итератор для перебора товаров в категории.
+        """
+        return CategoryIterator(self)
+
+
+class CategoryIterator:
+    """
+    Итератор для перебора товаров в категории.
+    """
+
+    def __init__(self, category: "Category"):
+        """
+        Инициализация итератора.
+
+        Args:
+            category: Объект Category для итерации
+        """
+        self._category = category
+        self._index = 0
+
+    def __iter__(self) -> Iterator[Product]:
+        """Возвращает сам итератор."""
+        return self
+
+    def __next__(self) -> Product:
+        """Возвращает следующий товар в категории."""
+        if self._index >= len(self._category._products):
+            raise StopIteration
+        product = self._category._products[self._index]
+        self._index += 1
+        return product

@@ -1,7 +1,11 @@
 from src import Category, Product
+from src.products import LawnGrass, Smartphone
 from src.utils import load_categories_from_json
 
 if __name__ == "__main__":
+    # Сбрасываем счетчики для чистой демонстрации
+    Category.reset_counters()
+
     print("=== Демонстрация из задания ===")
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
     product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
@@ -22,6 +26,10 @@ if __name__ == "__main__":
     print(product3.price)
     print(product3.quantity)
 
+    print(str(product1))
+    print(str(product2))
+    print(str(product3))
+
     category1 = Category(
         "Смартфоны",
         "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
@@ -30,9 +38,21 @@ if __name__ == "__main__":
 
     print(category1.name == "Смартфоны")
     print(category1.description)
-    print(len(category1.products))
+    print(len(category1.products_list))  # Используем products_list для получения списка
     print(category1.category_count)
     print(category1.product_count)
+
+    print(str(category1))
+
+    print(category1.products)
+
+    print(product1 + product2)
+    print(product1 + product3)
+    print(product2 + product3)
+
+    # Демонстрация геттера products
+    print("\nСписок продуктов в категории 'Смартфоны':")
+    print(category1.products)
 
     product4 = Product('55" QLED 4K', "Фоновая подсветка", 123000.0, 7)
     category2 = Category(
@@ -43,17 +63,73 @@ if __name__ == "__main__":
 
     print(category2.name)
     print(category2.description)
-    print(len(category2.products))
-    print(category2.products)
+    print(len(category2.products_list))
+    print(category2.products)  # Выводим через геттер
 
     print(Category.category_count)
     print(Category.product_count)
 
+    # Демонстрация add_product
+    print("\n=== Демонстрация метода add_product ===")
+
+    # Создаем новую категорию для демонстрации (не используем старую category1 повторно)
+    category_demo = Category(
+        "Демо-категория",
+        "Категория для демонстрации добавления продукта",
+        [product1, product2, product3],  # Те же продукты
+    )
+
+    print("До добавления продукта:")
+    print(category_demo.products)
+    print(f"Всего продуктов в системе: {Category.product_count}")
+
+    # Создаем новый продукт для добавления
+    product_new = Product("Новый смартфон", "Новая модель", 50000.0, 10)
+    category_demo.add_product(product_new)
+
+    print("\nПосле добавления продукта:")
+    print(category_demo.products)
+    print(f"Всего продуктов в системе: {Category.product_count}")
+
+    # Демонстрация new_product
+    print("\n=== Демонстрация класс-метода new_product ===")
+    new_product = Product.new_product(
+        {"name": "Samsung Galaxy S24", "description": "512GB, Черный", "price": 200000.0, "quantity": 3}
+    )
+    print(f"Имя: {new_product.name}")
+    print(f"Описание: {new_product.description}")
+    print(f"Цена: {new_product.price}")
+    print(f"Количество: {new_product.quantity}")
+
+    # Демонстрация сеттера цены
+    print("\n=== Демонстрация сеттера цены ===")
+    test_product = Product("Тестовый продукт", "Для теста цены", 1000.0, 5)
+
+    # Меняем на корректную цену
+    test_product.price = 800
+    print(f"Новая цена: {test_product.price}")
+
+    # Пытаемся установить отрицательную цену
+    test_product.price = -100
+    print(f"Цена после попытки установить -100: {test_product.price}")
+
+    # Пытаемся установить нулевую цену
+    test_product.price = 0
+    print(f"Цена после попытки установить 0: {test_product.price}")
+
+    print("\n=== Демонстрация строкового представления категории ===")
+    print(f"Категория: {category1}")
+    print(f"Общее количество товаров в категории: {category1.total_quantity} шт.")
+
+    print("\n=== Демонстрация итерации по товарам категории ===")
+    print("Перебор товаров в категории 'Смартфоны':")
+    for i, product in enumerate(category1, 1):
+        print(f"  {i}. {product}")
+
     print("\n=== Загрузка из JSON файла ===")
 
-    # Сбрасываем счетчики для демонстрации
-    Category.category_count = 0
-    Category.product_count = 0
+    # Сбрасываем счетчики для демонстрации загрузки
+    Category.reset_counters()
 
     # Загружаем категории из JSON
     loaded_categories = load_categories_from_json()
@@ -67,9 +143,115 @@ if __name__ == "__main__":
         for i, category in enumerate(loaded_categories, 1):
             print(f"\nКатегория {i}: {category.name}")
             print(f"Описание: {category.description}")
-            print(f"Количество продуктов: {len(category.products)}")
+            print(f"Количество продуктов: {len(category.products_list)}")
+            print(f"Общее количество товаров: {category.total_quantity} шт.")
 
-            for product in category.products:
-                print(f"  - {product.name}: {product.price} руб., остаток: {product.quantity} шт.")
+            # Выводим продукты через геттер
+            print("Продукты:")
+            print(category.products)
     else:
         print("Не удалось загрузить данные из JSON файла.")
+# Урок 16.1
+
+if __name__ == "__main__":
+    smartphone1 = Smartphone(
+        "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5, 95.5, "S23 Ultra", 256, "Серый"
+    )
+    smartphone2 = Smartphone("Iphone 15", "512GB, Gray space", 210000.0, 8, 98.2, "15", 512, "Gray space")
+    smartphone3 = Smartphone("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14, 90.3, "Note 11", 1024, "Синий")
+
+    print(smartphone1.name)
+    print(smartphone1.description)
+    print(smartphone1.price)
+    print(smartphone1.quantity)
+    print(smartphone1.efficiency)
+    print(smartphone1.model)
+    print(smartphone1.memory)
+    print(smartphone1.color)
+
+    print(smartphone2.name)
+    print(smartphone2.description)
+    print(smartphone2.price)
+    print(smartphone2.quantity)
+    print(smartphone2.efficiency)
+    print(smartphone2.model)
+    print(smartphone2.memory)
+    print(smartphone2.color)
+
+    print(smartphone3.name)
+    print(smartphone3.description)
+    print(smartphone3.price)
+    print(smartphone3.quantity)
+    print(smartphone3.efficiency)
+    print(smartphone3.model)
+    print(smartphone3.memory)
+    print(smartphone3.color)
+
+    grass1 = LawnGrass("Газонная трава", "Элитная трава для газона", 500.0, 20, "Россия", "7 дней", "Зеленый")
+    grass2 = LawnGrass("Газонная трава 2", "Выносливая трава", 450.0, 15, "США", "5 дней", "Темно-зеленый")
+
+    print(grass1.name)
+    print(grass1.description)
+    print(grass1.price)
+    print(grass1.quantity)
+    print(grass1.country)
+    print(grass1.germination_period)
+    print(grass1.color)
+
+    print(grass2.name)
+    print(grass2.description)
+    print(grass2.price)
+    print(grass2.quantity)
+    print(grass2.country)
+    print(grass2.germination_period)
+    print(grass2.color)
+
+    smartphone_sum = smartphone1 + smartphone2
+    print(smartphone_sum)
+
+    grass_sum = grass1 + grass2
+    print(grass_sum)
+
+    try:
+        invalid_sum = smartphone1 + grass1
+    except TypeError:
+        print("Возникла ошибка TypeError при попытке сложения")
+    else:
+        print("Не возникла ошибка TypeError при попытке сложения")
+
+    category_smartphones = Category("Смартфоны", "Высокотехнологичные смартфоны", [smartphone1, smartphone2])
+    category_grass = Category("Газонная трава", "Различные виды газонной травы", [grass1, grass2])
+
+    category_smartphones.add_product(smartphone3)
+
+    print(category_smartphones.products)
+
+    print(Category.product_count)
+
+    try:
+        category_smartphones.add_product("Not a product")
+    except TypeError:
+        print("Возникла ошибка TypeError при добавлении не продукта")
+    else:
+        print("Не возникла ошибка TypeError при добавлении не продукта")
+
+    if __name__ == "__main__":
+        try:
+            product_invalid = Product("Бракованный товар", "Неверное количество", 1000.0, 0)
+        except ValueError:
+            print(
+                "Возникла ошибка ValueError прерывающая работу программы при попытке добавить продукт с нулевым количеством"
+            )
+        else:
+            print("Не возникла ошибка ValueError при попытке добавить продукт с нулевым количеством")
+
+        product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+        product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+        product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
+
+        category1 = Category("Смартфоны", "Категория смартфонов", [product1, product2, product3])
+
+        print(category1.middle_price())
+
+        category_empty = Category("Пустая категория", "Категория без продуктов", [])
+        print(category_empty.middle_price())

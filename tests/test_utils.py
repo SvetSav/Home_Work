@@ -3,6 +3,7 @@ import os
 import tempfile
 
 from src.categories import Category
+from src.products import Product
 from src.utils import load_categories_from_json
 
 
@@ -59,15 +60,24 @@ class TestJsonLoader:
             category = categories[0]
             assert category.name == "Тестовая категория"
             assert category.description == "Описание тестовой категории"
-            assert len(category.products) == 2
+            assert len(category.products_list) == 2
 
-            # Проверяем продукты
-            product1 = category.products[0]
+            # Проверяем геттер products (строка)
+            products_str = category.products
+            assert "Тестовый продукт 1" in products_str
+            assert "1000.0 руб." in products_str
+            assert "Остаток: 10 шт." in products_str
+            assert "Тестовый продукт 2" in products_str
+            assert "2000.0 руб." in products_str
+            assert "Остаток: 5 шт." in products_str
+
+            # Проверяем продукты через список
+            product1 = category.products_list[0]
             assert product1.name == "Тестовый продукт 1"
             assert product1.price == 1000.0
             assert product1.quantity == 10
 
-            product2 = category.products[1]
+            product2 = category.products_list[1]
             assert product2.name == "Тестовый продукт 2"
             assert product2.price == 2000.0
             assert product2.quantity == 5
@@ -149,11 +159,70 @@ class TestJsonLoader:
 
             # Проверяем первую категорию
             assert categories[0].name == "Категория 1"
-            assert len(categories[0].products) == 1
+            assert len(categories[0].products_list) == 1
 
             # Проверяем вторую категорию
             assert categories[1].name == "Категория 2"
-            assert len(categories[1].products) == 2
+            assert len(categories[1].products_list) == 2
 
         finally:
+            os.unlink(temp_file_path)
+
+    def test_load_categories_from_valid_json_with_new_features(self):
+        """Тест загрузки из корректного JSON файла с проверкой новой функциональности."""
+        test_data = [
+            {
+                "name": "Тестовая категория",
+                "description": "Описание тестовой категории",
+                "products": [
+                    {
+                        "name": "Тестовый продукт 1",
+                        "description": "Описание тестового продукта 1",
+                        "price": 1000.0,
+                        "quantity": 10,
+                    },
+                    {
+                        "name": "Тестовый продукт 2",
+                        "description": "Описание тестового продукта 2",
+                        "price": 2000.0,
+                        "quantity": 5,
+                    },
+                ],
+            }
+        ]
+
+        # Создаем временный файл
+        temp_file_path = self.create_test_json_file(test_data)
+
+        try:
+            # Загружаем данные
+            categories = load_categories_from_json(temp_file_path)
+
+            # Проверяем результаты
+            assert len(categories) == 1
+            assert Category.category_count == 1
+            assert Category.product_count == 2
+
+            category = categories[0]
+            assert category.name == "Тестовая категория"
+            assert category.description == "Описание тестовой категории"
+
+            # Проверяем что геттер products работает
+            products_str = category.products
+            assert "Тестовый продукт 1" in products_str
+            assert "1000.0" in products_str
+            assert "10" in products_str
+            assert "Тестовый продукт 2" in products_str
+            assert "2000.0" in products_str
+            assert "5" in products_str
+
+            # Проверяем что можем добавить новый продукт
+            new_product = Product("Новый продукт", "Описание", 3000.0, 3)
+            category.add_product(new_product)
+
+            assert Category.product_count == 3
+            assert "Новый продукт" in category.products
+
+        finally:
+            # Удаляем временный файл
             os.unlink(temp_file_path)
